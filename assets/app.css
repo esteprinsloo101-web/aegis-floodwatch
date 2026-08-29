@@ -1,0 +1,11 @@
+html,body{height:100%;margin:0;background:#070b12;color:#e7eef6;font-family:IBM Plex Sans,Segoe UI,sans-serif}
+.app{display:grid;grid-template-rows:58px auto 1fr 34px;height:100%}
+.topbar{display:flex;align-items:center;gap:12px;padding:0 14px;border-bottom:1px solid #1c2a3a;background:#0a1018}
+.brand h1{margin:0;font-size:15px;letter-spacing:.16em}.brand h1 span{color:#3ee0c6}
+.alert-strip{background:#3a1018;color:#ffd0d8;font-size:12px;padding:7px 16px}
+.workspace{min-height:0;position:relative}#map{position:absolute;inset:0;background:#0a1016}
+.live-pills{margin-left:auto;display:flex;gap:8px}
+button.solid{background:#3ee0c6;border:0;color:#06221e;border-radius:8px;padding:6px 10px;font-weight:600}
+button.ghost{background:transparent;border:1px solid #243648;color:#e7eef6;border-radius:8px;padding:6px 10px}
+.modal{display:none;position:fixed;inset:0;background:#0008;align-items:center;justify-content:center;z-index:2000}
+.modal.on{display:flex}.modal-card{width:min(640px,92vw);background:#101820;border-radius:16px;padding:22px;overflow:auto;max-height:84vh}
