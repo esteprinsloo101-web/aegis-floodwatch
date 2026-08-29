@@ -1,12 +1,27 @@
 # AEGIS Floodwatch
 
-Adaptive Early-warning Global Inundation System.
+Public alerts and **Get me to safety** are free.
+The fee is only the Science Desk (Payoneer).
 
-**Public alerts and Get-me-to-safety are free. The fee is only the science desk.**
+**Live:** https://esteprinsloo101-web.github.io/aegis-floodwatch/
 
-- Live repo: https://github.com/esteprinsloo101-web/aegis-floodwatch
-- Pages (enable in Settings → Pages → main / root): https://esteprinsloo101-web.github.io/aegis-floodwatch/
-- Stripe live product: `AEGIS Science Desk` `prod_VA35d5AGezpnSC` · `price_1U9izjATU39BoXbMvYyV4hbi` · **R89 / month ZAR**
-- Helping people is not a SKU.
+Science Desk checkout: [Payoneer payment link](https://link.payoneer.com/Token?t=A938DA53D50E464FB7E8C35081F7344F&src=pl)
 
-Open `index.html` via any static host. Live USGS / GDACS / GloFAS probes run in the browser.
+Do not publish bank account numbers on this site.
+
+## What it does
+
+- Global map of flood, earthquake, tsunami, cyclone, tornado and fire risk
+- Click a point for weather, GloFAS discharge and marine waves
+- HEC-RAS-style screening (Manning depth, rating curve, Froude)
+- Safe-ground routing
+- Official GDACS colour plus public-signal corroboration
+
+## Honest limits
+
+- Not a full HEC-RAS 2D unsteady model
+- Earthquakes are detections, not timed predictions
+- Fire is environmental alignment (FWI), not an ignition clock
+- Barrier-lake collapse is a watch, not a GloFAS hydrograph
+
+Prototype for Este Prinsloo. Public data stays under its own licences.
