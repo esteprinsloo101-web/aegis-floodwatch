@@ -1,152 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AEGIS Floodwatch — Adaptive Early-warning Global Inundation System</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="assets/app.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>AEGIS Floodwatch</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  html,body{margin:0;height:100%;background:#070b12;color:#e7eef6;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+  body{display:flex;flex-direction:column;min-height:100dvh}
+  header{padding:10px 12px 8px;background:#0a1018;border-bottom:1px solid #1c2a3a}
+  header h1{margin:0;font-size:15px;letter-spacing:.12em}
+  header h1 span{color:#3ee0c6}
+  header p{margin:4px 0 8px;color:#8b9bb0;font-size:12px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap}
+  button{border-radius:10px;padding:10px 12px;font-size:14px}
+  .solid{background:#3ee0c6;border:0;color:#06221e;font-weight:700}
+  .ghost{background:transparent;border:1px solid #243648;color:#e7eef6}
+  .alert{background:#3a1018;color:#ffd0d8;padding:8px 12px;font-size:12px}
+  #map{flex:1;min-height:62dvh;width:100%;background:#0a1016}
+  .legend{padding:8px 12px 16px;font-size:12px;color:#8b9bb0}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+  .modal{display:none;position:fixed;inset:0;background:#0009;align-items:center;justify-content:center;z-index:9999;padding:16px}
+  .modal.on{display:flex}
+  .card{background:#101820;border:1px solid #243648;border-radius:16px;padding:16px;max-width:520px;width:100%;max-height:80dvh;overflow:auto}
+</style>
 </head>
 <body>
-  <div class="app">
-    <header class="topbar">
-      <div class="brand">
-        <div class="mark" aria-hidden="true"></div>
-        <div>
-          <h1>AEGIS <span>FLOODWATCH</span></h1>
-          <small>Adaptive Early-warning Global Inundation System</small>
-        </div>
-      </div>
-      <label class="search">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b9bb0" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
-        <input id="q" placeholder="Jump to a river, city or coordinate" />
-        <kbd>↵</kbd>
-      </label>
-      <div class="live-pills">
-        <div class="pill"><span class="dot crit"></span> Nepal–Tibet GLOF active</div>
-        <div class="pill"><span class="dot warn"></span> watch boxes live</div>
-        <button class="solid" type="button" onclick="AEGIS.locateAndGo()">Get me to safety</button>
-        <button class="ghost" type="button" onclick="AEGIS.openAccess()">Access</button>
-      </div>
-    </header>
-    <div class="alert-strip" id="alert-strip">
-      PUBLIC ALERTS ARE FREE. If you are in a valley with a rising lake or a flood watch, move to the marked safe ground now.
-    </div>
-    <div class="haz-bar" id="haz-bar">
-      <button class="haz on" data-haz="all">All hazards</button>
-      <button class="haz" data-haz="flood">Flood / GLOF</button>
-      <button class="haz" data-haz="eq">Earthquake</button>
-      <button class="haz" data-haz="tsunami">Tsunami</button>
-      <button class="haz" data-haz="tc">Hurricane / typhoon</button>
-      <button class="haz" data-haz="tornado">Tornado</button>
-      <button class="haz" data-haz="fire">Wildfire</button>
-    </div>
-    <div class="workspace">
-      <aside class="side">
-        <div class="section-label">World snapshot</div>
-        <div class="stat-grid" id="global-stats"></div>
-        <div class="section-label">Map layers</div>
-        <label class="layer-row"><input type="checkbox" data-layer="zones" checked /> Risk zones</label>
-        <label class="layer-row"><input type="checkbox" data-layer="gauges" checked /> Discharge cells</label>
-        <label class="layer-row"><input type="checkbox" data-layer="inundation" checked /> Indicative inundation</label>
-        <label class="layer-row"><input type="checkbox" data-layer="gdacs" checked /> GDACS alerts</label>
-        <label class="layer-row"><input type="checkbox" data-layer="safe" checked /> Safe zones</label>
-        <label class="layer-row"><input type="checkbox" data-layer="rasNow" checked /> RAS layer · GloFAS Q</label>
-        <label class="layer-row"><input type="checkbox" data-layer="rasGlof" checked /> RAS layer · GLOF peak</label>
-        <label class="layer-row"><input type="checkbox" data-layer="rasXs" checked /> RAS cross-sections</label>
-        <label class="layer-row"><input type="checkbox" data-layer="eq" checked /> Earthquakes (USGS)</label>
-        <label class="layer-row"><input type="checkbox" data-layer="fire" checked /> Fire weather + detections</label>
-        <label class="layer-row"><input type="checkbox" data-layer="tc" checked /> Cyclones (GDACS)</label>
-        <div class="section-label">Priority zones</div>
-        <div id="zone-list"></div>
-        <div class="section-label">Evidence rule</div>
-        <p class="lede">Public CRITICAL requires two independent sources: a model signal (GloFAS / HEC-RAS screen / satellite water) and a human or official signal (GDACS, hydromet, corroborated post).</p>
-        <div class="row-actions">
-          <button class="solid" onclick="AEGIS.locateAndGo()">I am here — route to safety</button>
-          <button class="ghost" onclick="AEGIS.zoomWorld()">World</button>
-          <button class="ghost" onclick="AEGIS.openScience()">Science</button>
-        </div>
-      </aside>
-      <main class="map-wrap">
-        <div id="map"></div>
-        <div class="map-hud">
-          <div class="hud-card">
-            <h3>Forecast day</h3>
-            <div class="time-row">
-              <input id="day-slider" type="range" min="0" max="15" value="0" />
-              <span id="day-label">2026-08-29</span>
-            </div>
-          </div>
-          <div class="hud-card">
-            <h3>Risk legend</h3>
-            <div class="legend">
-              <span><i style="background:#ff4d6a"></i> critical</span>
-              <span><i style="background:#f5a524"></i> watch</span>
-              <span><i style="background:#f2d057"></i> advisory</span>
-              <span><i style="background:#3ee0c6"></i> elevated</span>
-              <span><i style="background:#4ade80"></i> quiet</span>
-            </div>
-            <p class="lede" id="probe-status" style="margin:8px 0 0"></p>
-          </div>
-        </div>
-      </main>
-      <aside class="rail">
-        <nav class="tabs">
-          <button class="on" data-pane="pane-go">GO</button>
-          <button data-pane="pane-haz">HAZARD</button>
-          <button data-pane="pane-sit">SITREP</button>
-          <button data-pane="pane-fc">WX / Q</button>
-          <button data-pane="pane-hy">RAS</button>
-          <button data-pane="pane-sg">SIGNALS</button>
-          <button data-pane="pane-op">OPS</button>
-        </nav>
-        <section class="pane on" id="pane-go"><div id="go-body"></div></section>
-        <section class="pane" id="pane-haz"><div id="haz-body"></div></section>
-        <section class="pane" id="pane-sit"><div id="sit-body"></div></section>
-        <section class="pane" id="pane-fc"><div id="fc-body"></div></section>
-        <section class="pane" id="pane-hy"><div id="hy-body"></div></section>
-        <section class="pane" id="pane-sg"><div id="sg-body"></div></section>
-        <section class="pane" id="pane-op"><div id="op-body"></div></section>
-      </aside>
-    </div>
-    <footer class="footer">
-      <b id="clock">UTC</b>
-      <span>Screening product — not an official warning</span>
-      <span>Hydrology: Copernicus GloFAS / LISFLOOD</span>
-      <span>Alerts: GDACS</span>
-      <span>Weather models: ICON · GFS · ECMWF (Ventusky family)</span>
-      <span>Hydraulic screen: Manning normal depth (HEC-RAS compatible)</span>
-    </footer>
+<header>
+  <h1>AEGIS <span>FLOODWATCH</span></h1>
+  <p>Public alerts are free. Move to high ground if you are in a watch zone.</p>
+  <div class="btns">
+    <button class="solid" id="go">Get me to safety</button>
+    <button class="ghost" id="accessBtn">Access</button>
   </div>
-  <div class="modal" id="access" onclick="if(event.target===this)AEGIS.closeAccess()">
-    <div class="modal-card">
-      <button class="xbtn" onclick="AEGIS.closeAccess()">×</button>
-      <h2>Access</h2>
-      <p>The intent is to get people off the floodplain while there is still time. A fee pays for the desk that watches every basin, not for the warning itself.</p>
-      <div id="access-body"></div>
-    </div>
+</header>
+<div class="alert">Nepal–Tibet GLOF watch active. Red = risk corridor. Green = safer ground.</div>
+<div id="map"></div>
+<div class="legend">
+  <span class="dot" style="background:#ff4d6a"></span> risk zone
+  &nbsp; <span class="dot" style="background:#4ade80"></span> safe ground
+</div>
+<div class="modal" id="access">
+  <div class="card">
+    <button class="ghost" id="closeAccess" style="float:right">Close</button>
+    <h2>Access</h2>
+    <p>Get me to safety stays free. Payoneer is only for the science desk.</p>
+    <p><b>Public Alert</b> — Free forever</p>
+    <p><b>Science Desk</b> — R89 / month</p>
+    <p><a class="solid" style="display:inline-block;text-decoration:none" href="https://link.payoneer.com/Token?t=A938DA53D50E464FB7E8C35081F7344F&src=pl">Pay with Payoneer</a></p>
   </div>
-  <div class="modal" id="science" onclick="if(event.target===this)AEGIS.closeScience()">
-    <div class="modal-card">
-      <button class="xbtn" onclick="AEGIS.closeScience()">×</button>
-      <h2>Scientific basis</h2>
-      <p>AEGIS is a screening and coordination layer. It does not replace a national flood warning service or a licensed hydraulic study.</p>
-      <h3>1. What actually happened in Nepal and Tibet</h3>
-      <p>On 26 August 2026 an ice-rock avalanche collapsed into the Lhende River on the Nepal–Tibet divide. The debris briefly dammed the river. When that dam failed, a surge of water, ice, mud and rock ran into the Bhotekoshi–Trishuli system. This is a glacial lake outburst / debris-flood cascade, not a classic monsoon river flood.</p>
-      <h3>2. Weather, hydrology, hydraulics</h3>
-      <p>Ventusky has no public API. AEGIS reads the same public models through Open-Meteo and GloFAS. Hydraulics are Manning normal-depth screening, the first step HEC-RAS uses. Public CRITICAL requires two independent sources.</p>
-      <p>Public alerts stay free. Science Desk pays via Payoneer.</p>
-    </div>
-  </div>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="assets/data.js"></script>
-  <script src="assets/model.js"></script>
-  <script src="assets/hydraulics.js"></script>
-  <script src="assets/hazards.js"></script>
-  <script src="assets/hazards_snap.js"></script>
-  <script src="assets/app.js"></script>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const PAY = "https://link.payoneer.com/Token?t=A938DA53D50E464FB7E8C35081F7344F&src=pl";
+const map = L.map("map").setView([28.15, 85.33], 8);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  attribution: "© OpenStreetMap"
+}).addTo(map);
+L.circle([28.2, 85.35], {radius:18000, color:"#ff4d6a", fillOpacity:0.2, weight:2}).addTo(map).bindPopup("Rasuwa / Gyirong risk corridor");
+L.circleMarker([28.108, 85.298], {radius:9, color:"#4ade80", fillColor:"#4ade80", fillOpacity:1}).addTo(map).bindPopup("Dhunche high ground");
+function size(){ setTimeout(function(){ map.invalidateSize(); }, 100); }
+size(); window.addEventListener("resize", size);
+document.getElementById("go").onclick = function(){
+  if(!navigator.geolocation){ alert("Turn location on."); return; }
+  navigator.geolocation.getCurrentPosition(function(pos){
+    const lat=pos.coords.latitude, lon=pos.coords.longitude;
+    L.marker([lat,lon]).addTo(map).bindPopup("You are here").openPopup();
+    map.setView([lat,lon], 13);
+    size();
+  }, function(){ alert("Allow location so we can place you on the map."); });
+};
+document.getElementById("accessBtn").onclick = function(){ document.getElementById("access").classList.add("on"); };
+document.getElementById("closeAccess").onclick = function(){ document.getElementById("access").classList.remove("on"); };
+document.getElementById("access").onclick = function(e){ if(e.target.id==="access") e.currentTarget.classList.remove("on"); };
+</script>
 </body>
 </html>
