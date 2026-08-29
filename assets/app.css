@@ -1,11 +1,31 @@
-html,body{height:100%;margin:0;background:#070b12;color:#e7eef6;font-family:IBM Plex Sans,Segoe UI,sans-serif}
-.app{display:grid;grid-template-rows:58px auto 1fr 34px;height:100%}
-.topbar{display:flex;align-items:center;gap:12px;padding:0 14px;border-bottom:1px solid #1c2a3a;background:#0a1018}
-.brand h1{margin:0;font-size:15px;letter-spacing:.16em}.brand h1 span{color:#3ee0c6}
-.alert-strip{background:#3a1018;color:#ffd0d8;font-size:12px;padding:7px 16px}
-.workspace{min-height:0;position:relative}#map{position:absolute;inset:0;background:#0a1016}
-.live-pills{margin-left:auto;display:flex;gap:8px}
-button.solid{background:#3ee0c6;border:0;color:#06221e;border-radius:8px;padding:6px 10px;font-weight:600}
-button.ghost{background:transparent;border:1px solid #243648;color:#e7eef6;border-radius:8px;padding:6px 10px}
-.modal{display:none;position:fixed;inset:0;background:#0008;align-items:center;justify-content:center;z-index:2000}
-.modal.on{display:flex}.modal-card{width:min(640px,92vw);background:#101820;border-radius:16px;padding:22px;overflow:auto;max-height:84vh}
+html,body{height:100%;height:100dvh;margin:0;background:#070b12;color:#e7eef6;font-family:IBM Plex Sans,Segoe UI,sans-serif;overflow:hidden}
+.app{display:grid;grid-template-rows:auto auto auto minmax(220px,1fr) auto;height:100%;height:100dvh}
+.topbar{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid #1c2a3a;background:#0a1018}
+.brand h1{margin:0;font-size:13px;letter-spacing:.12em}.brand h1 span{color:#3ee0c6}
+.brand small{display:none;color:#5d6d82;font-size:10px}
+.search{display:none}
+.alert-strip{background:#3a1018;color:#ffd0d8;font-size:11px;padding:6px 10px}
+.haz-bar{display:flex;gap:6px;overflow:auto;padding:6px 10px;border-bottom:1px solid #1c2a3a;background:#0a1118;-webkit-overflow-scrolling:touch}
+.haz-bar .haz{flex:0 0 auto;background:transparent;border:1px solid #243648;color:#8b9bb0;border-radius:999px;padding:5px 10px;font-size:11px}
+.workspace{position:relative;min-height:220px}
+#map{position:absolute;inset:0;background:#0a1016;z-index:1}
+.side,.rail,.footer{display:none}
+.map-hud{display:none}
+.live-pills{margin-left:auto;display:flex;gap:6px;align-items:center}
+.live-pills .pill{display:none}
+button.solid,button.ghost{border-radius:8px;padding:8px 10px;cursor:pointer;font-size:12px;white-space:nowrap}
+button.solid{background:#3ee0c6;border:0;color:#06221e;font-weight:600}
+button.ghost{background:transparent;border:1px solid #243648;color:#e7eef6}
+.modal{display:none;position:fixed;inset:0;z-index:2000;background:#0008;align-items:center;justify-content:center}
+.modal.on{display:flex}
+.modal-card{width:min(640px,94vw);max-height:86vh;overflow:auto;background:#101820;border:1px solid #243648;border-radius:16px;padding:18px}
+.price-card{border:1px solid #243648;border-radius:12px;padding:12px;margin:10px 0;background:#0a1118}
+.lede{color:#8b9bb0;font-size:13px;line-height:1.5}
+.leaflet-container{background:#0a1016}
+@media(min-width:900px){
+  .brand small,.search,.map-hud,.footer,.live-pills .pill{display:flex}
+  .search{display:flex;flex:1;max-width:380px;align-items:center;gap:8px;background:#0a1118;border:1px solid #243648;border-radius:999px;padding:6px 12px}
+  .search input{flex:1;background:transparent;border:0;color:#e7eef6}
+  .side,.rail{display:block}
+  .workspace{display:block}
+}
