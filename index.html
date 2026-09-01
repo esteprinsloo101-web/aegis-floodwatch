@@ -3,80 +3,76 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AEGIS Floodwatch — free public weather watch for households</title>
-<meta name="description" content="Free South African storm and flood watch. Paid Science Desk adds a daily household brief." />
+<title>AEGIS Floodwatch — live world disaster map</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-:root{--bg:#070b12;--card:#101820;--line:#243648;--mint:#3ee0c6;--warn:#ffb020;--hot:#ff4d6a;--ok:#4ade80;--muted:#8b9bb0}
-*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:#e7eef6;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
-header{padding:16px 18px 8px;border-bottom:1px solid var(--line)}
-.brand{letter-spacing:.14em;font-size:13px;font-weight:800} .brand span{color:var(--mint)}
-.hero{max-width:720px;font-size:28px;line-height:1.15;margin:10px 0 8px}
-.lead{color:var(--muted);max-width:640px}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-a.btn,button{border-radius:12px;padding:11px 14px;font-size:14px;font-weight:700;text-decoration:none;border:0;cursor:pointer}
-.solid{background:var(--mint);color:#06221e}.ghost{background:transparent;border:1px solid var(--line);color:#e7eef6}
-.banner{background:#3a2410;color:#ffe7bf;padding:12px 18px;font-size:14px;border-bottom:1px solid #5a3a18}
-.banner b{color:#fff}
-.note{background:#132018;color:#b7e4c7;padding:10px 18px;font-size:13px}
-#map{height:52dvh;min-height:280px;width:100%;background:#0a1016}
-.wrap{max-width:860px;margin:0 auto;padding:20px 18px 64px}
-.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
-.card h3{margin:0 0 8px}.muted{color:var(--muted);font-size:14px}
-.price{font-size:22px;color:var(--mint);margin:8px 0}
-.tag{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mint);font-weight:800}
-.legend{padding:8px 18px 0;color:var(--muted);font-size:12px}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+*{box-sizing:border-box}html,body{margin:0;background:#070b12;color:#e7eef6;font-family:system-ui,sans-serif}
+header{padding:14px 16px}
+.brand span{color:#3ee0c6}
+.hero{font-size:26px;margin:8px 0}
+.lead{color:#8b9bb0;max-width:740px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+button,.btn{border-radius:12px;padding:10px 14px;font-weight:700;border:0;cursor:pointer;text-decoration:none;display:inline-block}
+.solid{background:#3ee0c6;color:#06221e}.ghost{background:transparent;border:1px solid #243648;color:#e7eef6}
+.banner{background:#3a2410;color:#ffe7bf;padding:10px 16px}
+#map{height:62dvh;min-height:360px;width:100%}
+.legend,.wrap{padding:10px 16px;color:#8b9bb0;font-size:13px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 6px 0 10px}
+.card{background:#101820;border:1px solid #243648;border-radius:16px;padding:14px;margin:12px 0;color:#e7eef6}
 </style>
 </head>
 <body>
 <header>
   <div class="brand">AEGIS <span>FLOODWATCH</span></div>
-  <h1 class="hero">See the storm before the road floods.</h1>
-  <p class="lead">AEGIS is a public weather and flood watch for households. The map and watch list stay free. The Science Desk is the paid brief: what it means for your house, car and cash.</p>
+  <h1 class="hero">Live world map. Every open storm, fire, quake and flood we can plot.</h1>
+  <p class="lead">The map starts on the whole Earth. Texas, the Pacific and South Africa are pins, not only a Cape zoom.</p>
   <div class="row">
-    <button class="solid" id="go">Place me on the map</button>
-    <a class="ghost" href="#paid">See paid Science Desk</a>
+    <button class="solid" id="world">World</button>
+    <button class="ghost" id="texas">Texas / Edouard</button>
+    <button class="ghost" id="sa">South Africa</button>
+    <button class="ghost" id="go">Place me</button>
+    <a class="btn ghost" href="desk.html">Preview paid Science Desk</a>
   </div>
 </header>
-<div class="banner"><b>South Africa watch — 3–5 Sep 2026:</b> SAWS Yellow Level 4 cut-off low. Disruptive rain Overberg and Garden Route Thursday. Damaging wind Namakwa, Cape Winelands, Central Karoo, Little Karoo Thu–Fri. Dangerous waves Alexander Bay to Plettenberg Bay. This is the local threat. There is no hurricane heading for South Africa tonight.</div>
-<div class="note">Global tropical desk: Tropical Storm Edouard is making landfall on the Texas / Louisiana coast. Pacific storms Karina, Lowell and Marie are in the open Pacific. None of those tracks reach South Africa.</div>
+<div class="banner" id="banner">Loading live layers…</div>
 <div id="map"></div>
-<div class="legend"><span class="dot" style="background:#ff4d6a"></span> watch / risk &nbsp; <span class="dot" style="background:#4ade80"></span> higher ground</div>
+<div class="legend">
+  <span class="dot" style="background:#ff4d6a"></span>storm / flood
+  <span class="dot" style="background:#ffb020"></span>wildfire
+  <span class="dot" style="background:#c084fc"></span>volcano
+  <span class="dot" style="background:#60a5fa"></span>earthquake
+</div>
 <div class="wrap">
-  <h2>What this app is</h2>
-  <p class="muted">AEGIS watches flood, wind and tropical systems and puts them on one map so a household can move early. Public alerts are free. You do not need an account to read the watch.</p>
-  <div class="grid" style="margin-top:16px">
-    <div class="card">
-      <div class="tag">Free</div>
-      <h3>Public watch</h3>
-      <p class="muted">Current SA warning, global tropical status, and the map. Always visible. No card needed.</p>
-    </div>
-    <div class="card" id="paid">
-      <div class="tag">Paid · Science Desk</div>
-      <h3>Household brief — R89</h3>
-      <p class="price">R89</p>
-      <p class="muted">What the warning means for Western Cape / Northern Cape households: road risk, fill-or-wait, when to move stock off the floor. Paid in rand on Paystack. Test mode until Paystack finishes business review.</p>
-      <p><a class="btn solid" href="https://paystack.com/pay/aegis-science-desk">Pay Science Desk</a></p>
-    </div>
+  <div class="card" id="paid">
+    <h3>Paid product — AEGIS Science Desk R89</h3>
+    <p>After pay you get the household brief, not a second map. Preview: <a class="btn solid" href="desk.html">Open paid page preview</a></p>
+    <p><a class="btn solid" href="https://paystack.com/pay/aegis-science-desk">Paystack checkout (test)</a></p>
   </div>
-  <p class="muted" style="margin-top:20px">Not an official SAWS product. Confirm warnings on weathersa.co.za. Este Prinsloo · Western Cape / Northern Cape.</p>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const map = L.map("map").setView([-33.0, 21.5], 6);
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map);
-L.circle([-34.1, 20.5],{radius:90000,color:"#ff4d6a",fillOpacity:0.18,weight:2}).addTo(map).bindPopup("Overberg / Garden Route — Yellow 4 rain Thursday");
-L.circle([-32.2, 20.2],{radius:120000,color:"#ffb020",fillOpacity:0.14,weight:2}).addTo(map).bindPopup("Namakwa / Karoo / Winelands — damaging wind Thu–Fri");
-L.circleMarker([-33.932, 18.86],{radius:8,color:"#4ade80",fillColor:"#4ade80",fillOpacity:1}).addTo(map).bindPopup("Stellenbosch — higher ground reference");
-L.circleMarker([-31.91, 21.51],{radius:8,color:"#4ade80",fillColor:"#4ade80",fillOpacity:1}).addTo(map).bindPopup("Fraserburg — Karoo watch");
-document.getElementById("go").onclick=function(){
-  if(!navigator.geolocation){alert("Turn location on.");return;}
-  navigator.geolocation.getCurrentPosition(function(pos){
-    L.marker([pos.coords.latitude,pos.coords.longitude]).addTo(map).bindPopup("You are here").openPopup();
-    map.setView([pos.coords.latitude,pos.coords.longitude],10);
-  },function(){alert("Allow location to place you on the map.");});
+const map=L.map("map").setView([15,0],2);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OSM"}).addTo(map);
+function col(c){c=(c||"").toLowerCase();if(c.includes("fire"))return"#ffb020";if(c.includes("volcano"))return"#c084fc";if(c.includes("quake"))return"#60a5fa";return"#ff4d6a"}
+function pin(lat,lon,t,c){return L.circleMarker([lat,lon],{radius:8,color:col(c),fillColor:col(c),fillOpacity:.9,weight:2}).addTo(map).bindPopup("<b>"+t+"</b><br>"+c);}
+const edouard=pin(29.4,-93.3,"Tropical Storm Edouard — Texas / Louisiana landfall","storms");
+pin(15,-120,"Hurricane Karina — East Pacific","storms");
+pin(12,-155,"Hurricane Lowell — Central Pacific","storms");
+pin(16,-110,"Tropical Storm Marie — East Pacific","storms");
+L.circle([-34.1,20.5],{radius:90000,color:"#ff4d6a",fillOpacity:.15}).addTo(map).bindPopup("SAWS Yellow 4 rain — Overberg / Garden Route");
+L.circle([-32.2,20.2],{radius:120000,color:"#ffb020",fillOpacity:.12}).addTo(map).bindPopup("SAWS Yellow 4 wind — Namakwa / Karoo");
+let n=4;
+fetch("https://eonet.gsfc.nasa.gov/api/v3/events?status=open&limit=50").then(r=>r.json()).then(d=>{(d.events||[]).forEach(ev=>{const g=(ev.geometry||[]).slice(-1)[0];if(!g||!g.coordinates)return;const lon=g.coordinates[0],lat=g.coordinates[1];if(!isFinite(lat)||!isFinite(lon))return;n++;pin(lat,lon,ev.title,(ev.categories[0]&&ev.categories[0].title)||"event");});document.getElementById("banner").textContent=n+" live points on the world map.";}).catch(()=>{document.getElementById("banner").textContent="Live feed limited. Edouard / Pacific / SAWS pins are on the map — tap Texas / Edouard.";});
+fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson").then(r=>r.json()).then(d=>{(d.features||[]).slice(0,30).forEach(f=>{const c=f.geometry.coordinates;pin(c[1],c[0],f.properties.place,"earthquakes");n++;});document.getElementById("banner").textContent=n+" live points on the world map.";}).catch(()=>{});
+document.getElementById("world").onclick=()=>map.setView([15,0],2);
+document.getElementById("texas").onclick=()=>{map.setView([29.4,-93.3],6);edouard.openPopup();};
+document.getElementById("sa").onclick=()=>map.setView([-30,24],5);
+document.getElementById("go").onclick=()=>{
+  if(!navigator.geolocation)return alert("Turn location on.");
+  navigator.geolocation.getCurrentPosition(p=>{
+    L.circleMarker([p.coords.latitude,p.coords.longitude],{radius:8,color:"#4ade80",fillColor:"#4ade80",fillOpacity:1}).addTo(map).bindPopup("You are here").openPopup();
+    map.setView([p.coords.latitude,p.coords.longitude],7);
+  });
 };
 </script>
 </body>
