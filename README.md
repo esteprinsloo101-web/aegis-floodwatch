@@ -1,11 +1,11 @@
 # AEGIS Floodwatch
 
 Public alerts and **Get me to safety** are free.
-The fee is only the Science Desk (Payoneer).
+The fee is only the Science Desk (Paystack ZAR).
 
 **Live:** https://esteprinsloo101-web.github.io/aegis-floodwatch/
 
-Science Desk checkout: [Payoneer payment link](https://link.payoneer.com/Token?t=A938DA53D50E464FB7E8C35081F7344F&src=pl)
+Science Desk checkout: [Pay with Paystack — R89](https://paystack.com/pay/aegis-science-desk)
 
 Do not publish bank account numbers on this site.
 
