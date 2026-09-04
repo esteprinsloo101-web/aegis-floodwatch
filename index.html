@@ -1,90 +1,473 @@
-
 <!DOCTYPE html>
 <html lang="en-ZA">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AEGIS Floodwatch — live world disaster map</title>
+<title>AEGIS Floodwatch — global hazard watch + flood risk</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-*{box-sizing:border-box}html,body{margin:0;background:#070b12;color:#e7eef6;font-family:system-ui,sans-serif}
-header{padding:14px 16px}
-.brand span{color:#3ee0c6}
-.hero{font-size:26px;margin:8px 0}
-.lead{color:#8b9bb0;max-width:740px}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-button,.btn{border-radius:12px;padding:10px 14px;font-weight:700;border:0;cursor:pointer;text-decoration:none;display:inline-block}
-.solid{background:#3ee0c6;color:#06221e}.ghost{background:transparent;border:1px solid #243648;color:#e7eef6}
-.banner{background:#3a2410;color:#ffe7bf;padding:10px 16px}
-#map{height:62dvh;min-height:360px;width:100%}
-.legend,.wrap{padding:10px 16px;color:#8b9bb0;font-size:13px}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 6px 0 10px}
-.card{background:#101820;border:1px solid #243648;border-radius:16px;padding:14px;margin:12px 0;color:#e7eef6}
+:root{
+  --bg:#070b12; --panel:#0e1620; --card:#101820; --line:#243648;
+  --text:#e7eef6; --muted:#8b9bb0; --mint:#3ee0c6; --mint-ink:#06221e;
+  --storm:#ff4d6a; --fire:#ffb020; --volcano:#c084fc; --quake:#60a5fa; --you:#4ade80;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.45}
+a{color:var(--mint)}
+header{padding:14px 16px 8px;border-bottom:1px solid var(--line)}
+.brand{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.brand span{color:var(--mint);font-weight:700}
+h1{font-size:clamp(1.25rem,3.5vw,1.75rem);margin:8px 0 6px;font-weight:700}
+.lead{color:var(--muted);margin:0 0 12px;max-width:52rem;font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,.btn{
+  border-radius:12px;padding:10px 14px;font-weight:700;border:0;cursor:pointer;
+  text-decoration:none;display:inline-block;font-size:14px;font-family:inherit
+}
+.solid{background:var(--mint);color:var(--mint-ink)}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+.ghost:hover,.solid:hover{filter:brightness(1.08)}
+.banner{
+  background:#13202b;color:var(--muted);padding:8px 16px;font-size:13px;
+  border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center
+}
+.banner strong{color:var(--text)}
+.layout{display:grid;grid-template-columns:1fr;min-height:0}
+@media(min-width:900px){
+  .layout{grid-template-columns:1fr min(340px,36vw)}
+}
+#map{height:58dvh;min-height:320px;width:100%;background:#0a1018}
+@media(min-width:900px){#map{height:calc(100dvh - 210px);min-height:420px}}
+.side{
+  background:var(--panel);border-top:1px solid var(--line);
+  max-height:42dvh;overflow:auto;padding:10px 12px 16px
+}
+@media(min-width:900px){
+  .side{border-top:0;border-left:1px solid var(--line);max-height:calc(100dvh - 210px)}
+}
+.side h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:4px 0 10px}
+.layers{display:flex;flex-wrap:wrap;gap:8px 12px;margin-bottom:12px;font-size:13px}
+.layers label{display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text)}
+.event-list{list-style:none;margin:0;padding:0}
+.event-list li{
+  border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 8px;
+  cursor:pointer;background:var(--card);transition:border-color .15s
+}
+.event-list li:hover,.event-list li:focus{border-color:var(--mint);outline:none}
+.event-list .cat{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.event-list .title{font-weight:650;margin:2px 0}
+.event-list .meta{font-size:12px;color:var(--muted)}
+.legend{padding:10px 16px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 6px 0 10px;vertical-align:middle}
+.dot:first-child{margin-left:0}
+.wrap{padding:12px 16px 28px;max-width:960px}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:14px 16px;margin:12px 0;color:var(--text)
+}
+.card h3{margin:0 0 8px;font-size:1.05rem}
+.card p{margin:0 0 10px;color:var(--muted);font-size:14px}
+.card p b,.card p strong{color:var(--text)}
+.disclaimer{font-size:12px;color:var(--muted);margin-top:8px}
+.cta-secondary{opacity:.95}
+.empty{color:var(--muted);font-size:13px;padding:8px 0}
+.note-track{font-size:12px;color:var(--muted);margin:0 0 10px}
 </style>
 </head>
 <body>
 <header>
-  <div class="brand">AEGIS <span>FLOODWATCH</span></div>
-  <h1 class="hero">Live world map. Every open storm, fire, quake and flood we can plot.</h1>
-  <p class="lead">The map starts on the whole Earth. Texas, the Pacific and South Africa are pins, not only a Cape zoom.</p>
+  <div class="brand">AEGIS <span>Floodwatch</span></div>
+  <h1>Global hazard watch + flood risk screening</h1>
+  <p class="lead">Live open events from public science feeds on an OSM world map. Screening only — official warnings always take priority.</p>
   <div class="row">
-    <button class="solid" id="world">World</button>
-    <button class="ghost" id="texas">Texas / Edouard</button>
-    <button class="ghost" id="sa">South Africa</button>
-    <button class="ghost" id="go">Place me</button>
-    <a class="btn ghost" href="desk.html">Preview paid Science Desk</a>
+    <button type="button" class="solid" id="btn-world">World</button>
+    <button type="button" class="ghost" id="btn-sa">SA focus</button>
+    <button type="button" class="ghost" id="btn-place">Place me</button>
+    <a class="btn ghost cta-secondary" href="desk.html">Science Desk R89</a>
   </div>
 </header>
-<div class="banner" id="banner">Loading live layers…</div>
-<div id="map"></div>
+
+<div class="banner" id="banner" role="status">
+  <span>Loading live layers…</span>
+</div>
+
+<div class="layout">
+  <div id="map" role="application" aria-label="Hazard map"></div>
+  <aside class="side" aria-label="Layers and events">
+    <h2>Layers</h2>
+    <div class="layers">
+      <label><input type="checkbox" id="ly-eonet" checked /> NASA EONET</label>
+      <label><input type="checkbox" id="ly-usgs" checked /> USGS M4.5+</label>
+      <label><input type="checkbox" id="ly-gdacs" checked /> GDACS</label>
+    </div>
+    <p class="note-track">Storms: approximate track pins from EONET geometry. Floods: risk circles are screening only — not a forecast.</p>
+    <h2>Events</h2>
+    <ul class="event-list" id="event-list"><li class="empty">Fetching…</li></ul>
+  </aside>
+</div>
+
 <div class="legend">
-  <span class="dot" style="background:#ff4d6a"></span>storm / flood
-  <span class="dot" style="background:#ffb020"></span>wildfire
-  <span class="dot" style="background:#c084fc"></span>volcano
-  <span class="dot" style="background:#60a5fa"></span>earthquake
+  <span class="dot" style="background:var(--storm)"></span>storm / flood
+  <span class="dot" style="background:var(--fire)"></span>wildfire
+  <span class="dot" style="background:var(--volcano)"></span>volcano
+  <span class="dot" style="background:var(--quake)"></span>earthquake
 </div>
+
 <div class="wrap">
-  <div class="card" id="free-safety" style="border-color:#3ee0c6">
-    <h3>Free — Get me to safety</h3>
-    <p><b>Official warnings beat AEGIS.</b> If water is rising or roads flood: move to higher ground, never drive through flood water, follow SAWS / local disaster management.</p>
-    <p class="row">
-      <button class="solid" id="go2">Place me on the map</button>
+  <div class="card" style="border-color:var(--mint)">
+    <h3>Get me to safety — free</h3>
+    <p><strong>Official warnings beat AEGIS.</strong> If water is rising or roads flood: move to higher ground, never drive through flood water, follow SAWS and local disaster management.</p>
+    <div class="row">
+      <button type="button" class="solid" id="btn-place2">Place me</button>
       <a class="btn ghost" href="https://www.weathersa.co.za/" target="_blank" rel="noopener">SAWS official</a>
-    </p>
+    </div>
   </div>
-  <div class="card" id="paid">
-    <h3>Paid product — AEGIS Science Desk R89</h3>
-    <p>After pay you get the household brief, not a second map. Preview: <a class="btn solid" href="desk.html">Open paid page preview</a></p>
-    <p><a class="btn solid" href="https://paystack.com/pay/aegis-science-desk">Paystack Science Desk R89</a></p>
+
+  <div class="card cta-secondary">
+    <h3>Science Desk — R89</h3>
+    <p>Methods, hydro limits, lead-time table, and how to use this map for screening decisions. Never blocks the free map.</p>
+    <div class="row">
+      <a class="btn solid" href="desk.html">Open Science Desk</a>
+      <a class="btn ghost" href="https://paystack.com/pay/aegis-science-desk" target="_blank" rel="noopener">Paystack R89</a>
+    </div>
   </div>
+
+  <p class="disclaimer">
+    AEGIS Floodwatch is a <strong>screening product</strong>, not an official warning service.
+    It is not SAWS, USGS, PTWC, GDACS, or any national authority.
+    Live layers: NASA EONET, USGS earthquake feed (M4.5+ week), optional GDACS (browser CORS permitting).
+    Always follow official alerts for life-safety decisions.
+  </p>
 </div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const map=L.map("map").setView([15,0],2);
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OSM"}).addTo(map);
-function col(c){c=(c||"").toLowerCase();if(c.includes("fire"))return"#ffb020";if(c.includes("volcano"))return"#c084fc";if(c.includes("quake"))return"#60a5fa";return"#ff4d6a"}
-function pin(lat,lon,t,c){return L.circleMarker([lat,lon],{radius:8,color:col(c),fillColor:col(c),fillOpacity:.9,weight:2}).addTo(map).bindPopup("<b>"+t+"</b><br>"+c);}
-const edouard=pin(29.4,-93.3,"Tropical Storm Edouard — Texas / Louisiana landfall","storms");
-pin(15,-120,"Hurricane Karina — East Pacific","storms");
-pin(12,-155,"Hurricane Lowell — Central Pacific","storms");
-pin(16,-110,"Tropical Storm Marie — East Pacific","storms");
-L.circle([-34.1,20.5],{radius:90000,color:"#ff4d6a",fillOpacity:.15}).addTo(map).bindPopup("SAWS Yellow 4 rain — Overberg / Garden Route");
-L.circle([-32.2,20.2],{radius:120000,color:"#ffb020",fillOpacity:.12}).addTo(map).bindPopup("SAWS Yellow 4 wind — Namakwa / Karoo");
-let n=4;
-fetch("https://eonet.gsfc.nasa.gov/api/v3/events?status=open&limit=50").then(r=>r.json()).then(d=>{(d.events||[]).forEach(ev=>{const g=(ev.geometry||[]).slice(-1)[0];if(!g||!g.coordinates)return;const lon=g.coordinates[0],lat=g.coordinates[1];if(!isFinite(lat)||!isFinite(lon))return;n++;pin(lat,lon,ev.title,(ev.categories[0]&&ev.categories[0].title)||"event");});document.getElementById("banner").textContent=n+" live points on the world map.";}).catch(()=>{document.getElementById("banner").textContent="Live feed limited. Edouard / Pacific / SAWS pins are on the map — tap Texas / Edouard.";});
-fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson").then(r=>r.json()).then(d=>{(d.features||[]).slice(0,30).forEach(f=>{const c=f.geometry.coordinates;pin(c[1],c[0],f.properties.place,"earthquakes");n++;});document.getElementById("banner").textContent=n+" live points on the world map.";}).catch(()=>{});
-document.getElementById("world").onclick=()=>map.setView([15,0],2);
-document.getElementById("texas").onclick=()=>{map.setView([29.4,-93.3],6);edouard.openPopup();};
-document.getElementById("sa").onclick=()=>map.setView([-30,24],5);
-function placeMe(){
-  if(!navigator.geolocation)return alert("Turn location on.");
-  navigator.geolocation.getCurrentPosition(p=>{
-    L.circleMarker([p.coords.latitude,p.coords.longitude],{radius:8,color:"#4ade80",fillColor:"#4ade80",fillOpacity:1}).addTo(map).bindPopup("You are here").openPopup();
-    map.setView([p.coords.latitude,p.coords.longitude],7);
-  });
-}
-document.getElementById("go").onclick=placeMe;
-document.getElementById("go2").onclick=placeMe;
+(function () {
+  const map = L.map("map", { worldCopyJump: true }).setView([15, 0], 2);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap"
+  }).addTo(map);
+
+  const layers = {
+    eonet: L.layerGroup().addTo(map),
+    usgs: L.layerGroup().addTo(map),
+    gdacs: L.layerGroup().addTo(map)
+  };
+
+  const events = [];
+  const status = { eonet: "…", usgs: "…", gdacs: "…" };
+
+  function colorFor(cat) {
+    const c = (cat || "").toLowerCase();
+    if (c.includes("fire") || c.includes("wildfire")) return "#ffb020";
+    if (c.includes("volcano")) return "#c084fc";
+    if (c.includes("quake") || c.includes("seismic") || c.includes("earthquake")) return "#60a5fa";
+    return "#ff4d6a";
+  }
+
+  function isFloodish(cat, title) {
+    const s = ((cat || "") + " " + (title || "")).toLowerCase();
+    return s.includes("flood") || s.includes("rain") || s.includes("hydro");
+  }
+
+  function isStormish(cat, title) {
+    const s = ((cat || "") + " " + (title || "")).toLowerCase();
+    return s.includes("storm") || s.includes("cyclone") || s.includes("hurricane") || s.includes("typhoon") || s.includes("severe");
+  }
+
+  function fmtTime(iso) {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return String(iso);
+    return d.toISOString().replace("T", " ").slice(0, 16) + " UTC";
+  }
+
+  function updateBanner() {
+    const parts = [
+      "EONET: " + status.eonet,
+      "USGS: " + status.usgs,
+      "GDACS: " + status.gdacs
+    ];
+    document.getElementById("banner").innerHTML =
+      "<strong>" + events.length + " plotted</strong> · " + parts.join(" · ");
+  }
+
+  function renderList() {
+    const ul = document.getElementById("event-list");
+    if (!events.length) {
+      ul.innerHTML = '<li class="empty">No events loaded yet (feeds may be blocked or empty).</li>';
+      return;
+    }
+    const sorted = events.slice().sort(function (a, b) {
+      return (b.t || 0) - (a.t || 0);
+    });
+    ul.innerHTML = "";
+    sorted.forEach(function (ev, i) {
+      const li = document.createElement("li");
+      li.tabIndex = 0;
+      li.innerHTML =
+        '<div class="cat">' + escapeHtml(ev.category) + " · " + escapeHtml(ev.source) + "</div>" +
+        '<div class="title">' + escapeHtml(ev.title) + "</div>" +
+        '<div class="meta">' + escapeHtml(ev.when || "") +
+        (ev.lat != null ? " · " + ev.lat.toFixed(2) + ", " + ev.lon.toFixed(2) : "") + "</div>";
+      function go() {
+        if (ev.lat == null || ev.lon == null) return;
+        map.flyTo([ev.lat, ev.lon], Math.max(map.getZoom(), 5), { duration: 0.8 });
+        if (ev.marker && ev.marker.openPopup) ev.marker.openPopup();
+      }
+      li.addEventListener("click", go);
+      li.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); }
+      });
+      ul.appendChild(li);
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function addEvent(opts) {
+    const lat = opts.lat, lon = opts.lon;
+    if (!isFinite(lat) || !isFinite(lon)) return;
+    const col = colorFor(opts.category);
+    const marker = L.circleMarker([lat, lon], {
+      radius: opts.radius || 7,
+      color: col,
+      fillColor: col,
+      fillOpacity: 0.9,
+      weight: 2
+    });
+    const popup =
+      "<b>" + escapeHtml(opts.title) + "</b><br>" +
+      escapeHtml(opts.category) + "<br>" +
+      "<small>" + escapeHtml(opts.source) +
+      (opts.when ? " · " + escapeHtml(opts.when) : "") + "</small>";
+    marker.bindPopup(popup);
+    marker.addTo(layers[opts.layerKey] || layers.eonet);
+
+    if (opts.floodCircle) {
+      L.circle([lat, lon], {
+        radius: opts.floodCircle,
+        color: "#ff4d6a",
+        weight: 1,
+        fillOpacity: 0.12,
+        interactive: false
+      }).addTo(layers[opts.layerKey] || layers.eonet);
+    }
+
+    if (opts.track && opts.track.length > 1) {
+      const latlngs = opts.track.map(function (p) { return [p[0], p[1]]; });
+      L.polyline(latlngs, { color: col, weight: 2, opacity: 0.55, dashArray: "4 6" })
+        .addTo(layers[opts.layerKey] || layers.eonet);
+      opts.track.forEach(function (p, idx) {
+        if (idx === opts.track.length - 1) return;
+        L.circleMarker([p[0], p[1]], {
+          radius: 3, color: col, fillColor: col, fillOpacity: 0.5, weight: 1
+        }).addTo(layers[opts.layerKey] || layers.eonet);
+      });
+    }
+
+    const rec = {
+      title: opts.title,
+      category: opts.category || "event",
+      source: opts.source || "",
+      when: opts.when || "",
+      lat: lat,
+      lon: lon,
+      t: opts.t || 0,
+      marker: marker,
+      layerKey: opts.layerKey
+    };
+    events.push(rec);
+  }
+
+  function clearLayerEvents(key) {
+    for (let i = events.length - 1; i >= 0; i--) {
+      if (events[i].layerKey === key) events.splice(i, 1);
+    }
+    layers[key].clearLayers();
+  }
+
+  async function loadEonet() {
+    try {
+      const r = await fetch("https://eonet.gsfc.nasa.gov/api/v3/events?status=open&limit=80");
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const d = await r.json();
+      clearLayerEvents("eonet");
+      let n = 0;
+      (d.events || []).forEach(function (ev) {
+        const cat = (ev.categories && ev.categories[0] && ev.categories[0].title) || "event";
+        const geos = ev.geometry || [];
+        if (!geos.length) return;
+        const last = geos[geos.length - 1];
+        if (!last || !last.coordinates) return;
+        const lon = last.coordinates[0], lat = last.coordinates[1];
+        if (!isFinite(lat) || !isFinite(lon)) return;
+
+        let track = null;
+        if (isStormish(cat, ev.title) && geos.length > 1) {
+          track = [];
+          geos.forEach(function (g) {
+            if (!g.coordinates) return;
+            const lo = g.coordinates[0], la = g.coordinates[1];
+            if (isFinite(la) && isFinite(lo)) track.push([la, lo]);
+          });
+        }
+
+        let floodCircle = null;
+        if (isFloodish(cat, ev.title)) floodCircle = 75000;
+
+        addEvent({
+          lat: lat, lon: lon,
+          title: ev.title,
+          category: cat,
+          source: "NASA EONET",
+          when: fmtTime(last.date),
+          t: last.date ? Date.parse(last.date) : 0,
+          layerKey: "eonet",
+          track: track,
+          floodCircle: floodCircle
+        });
+        n++;
+      });
+      status.eonet = n + " open";
+    } catch (e) {
+      status.eonet = "unavailable";
+    }
+    updateBanner();
+    renderList();
+  }
+
+  async function loadUsgs() {
+    try {
+      const r = await fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson");
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const d = await r.json();
+      clearLayerEvents("usgs");
+      let n = 0;
+      (d.features || []).slice(0, 60).forEach(function (f) {
+        const c = f.geometry && f.geometry.coordinates;
+        if (!c) return;
+        const props = f.properties || {};
+        const mag = props.mag != null ? "M" + props.mag + " — " : "";
+        addEvent({
+          lat: c[1], lon: c[0],
+          title: mag + (props.place || "Earthquake"),
+          category: "earthquake",
+          source: "USGS",
+          when: props.time ? fmtTime(new Date(props.time).toISOString()) : "",
+          t: props.time || 0,
+          layerKey: "usgs",
+          radius: 6
+        });
+        n++;
+      });
+      status.usgs = n + " quakes";
+    } catch (e) {
+      status.usgs = "unavailable";
+    }
+    updateBanner();
+    renderList();
+  }
+
+  async function loadGdacs() {
+    // GDACS JSON often blocked by CORS in browsers; try and note gracefully.
+    const urls = [
+      "https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?fromdatetime=2020-01-01&todatetime=2030-01-01&alertlevel=Orange;Red&eventlist=EQ;TC;FL;VO;WF&limit=40",
+      "https://corsproxy.io/?https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?alertlevel=Orange;Red&eventlist=EQ;TC;FL;VO;WF&limit=30"
+    ];
+    clearLayerEvents("gdacs");
+    for (let i = 0; i < urls.length; i++) {
+      try {
+        const r = await fetch(urls[i]);
+        if (!r.ok) continue;
+        const d = await r.json();
+        const features = (d.features || d.events || (d.data && d.data.features) || []);
+        if (!features.length && !Array.isArray(features)) continue;
+        let n = 0;
+        features.forEach(function (f) {
+          let lat, lon, title, cat, when, t;
+          if (f.geometry && f.geometry.coordinates) {
+            lon = f.geometry.coordinates[0];
+            lat = f.geometry.coordinates[1];
+            const p = f.properties || {};
+            title = p.name || p.eventname || p.htmldescription || "GDACS event";
+            cat = p.eventtype || p.hazard || "GDACS";
+            when = p.fromdate || p.date || "";
+            t = when ? Date.parse(when) : 0;
+          } else if (f.lat != null) {
+            lat = +f.lat; lon = +f.lon;
+            title = f.name || "GDACS event";
+            cat = f.eventtype || "GDACS";
+          } else return;
+          if (!isFinite(lat) || !isFinite(lon)) return;
+          addEvent({
+            lat: lat, lon: lon,
+            title: String(title).slice(0, 120),
+            category: String(cat),
+            source: "GDACS",
+            when: when ? fmtTime(when) : "",
+            t: t || 0,
+            layerKey: "gdacs",
+            radius: 6,
+            floodCircle: String(cat).toUpperCase().includes("FL") ? 80000 : null
+          });
+          n++;
+        });
+        if (n > 0) {
+          status.gdacs = n + " alerts";
+          updateBanner();
+          renderList();
+          return;
+        }
+      } catch (e) { /* try next */ }
+    }
+    status.gdacs = "CORS blocked — use EONET/USGS";
+    updateBanner();
+    renderList();
+  }
+
+  function placeMe() {
+    if (!navigator.geolocation) {
+      alert("Location not available in this browser.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      function (p) {
+        const lat = p.coords.latitude, lon = p.coords.longitude;
+        L.circleMarker([lat, lon], {
+          radius: 9, color: "#4ade80", fillColor: "#4ade80", fillOpacity: 1, weight: 2
+        }).addTo(map).bindPopup("You are here").openPopup();
+        map.setView([lat, lon], 8);
+      },
+      function () { alert("Could not get location. Check permissions."); },
+      { enableHighAccuracy: true, timeout: 12000 }
+    );
+  }
+
+  document.getElementById("btn-world").onclick = function () { map.setView([15, 0], 2); };
+  document.getElementById("btn-sa").onclick = function () { map.setView([-30, 24], 5); };
+  document.getElementById("btn-place").onclick = placeMe;
+  document.getElementById("btn-place2").onclick = placeMe;
+
+  function bindToggle(id, key) {
+    document.getElementById(id).addEventListener("change", function (e) {
+      if (e.target.checked) map.addLayer(layers[key]);
+      else map.removeLayer(layers[key]);
+    });
+  }
+  bindToggle("ly-eonet", "eonet");
+  bindToggle("ly-usgs", "usgs");
+  bindToggle("ly-gdacs", "gdacs");
+
+  loadEonet();
+  loadUsgs();
+  loadGdacs();
+})();
 </script>
 </body>
 </html>
