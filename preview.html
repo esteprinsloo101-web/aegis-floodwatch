@@ -3,89 +3,65 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Product preview — how the whole set works</title>
+<title>AEGIS Floodwatch — product preview</title>
 <style>
-:root{--ink:#102018;--mint:#0f7b5a;--bg:#f3efe6}
-*{box-sizing:border-box}body{margin:0;font-family:Georgia,serif;background:var(--bg);color:var(--ink);line-height:1.5}
-header{background:#102018;color:#eef6f1;padding:28px 20px}
+:root{
+  --bg:#070b12; --card:#101820; --line:#243648; --text:#e7eef6; --muted:#8b9bb0;
+  --mint:#3ee0c6; --mint-ink:#06221e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}
+header{padding:28px 20px;border-bottom:1px solid var(--line)}
+.tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mint);font-weight:700}
+h1{margin:8px 0;font-size:clamp(1.4rem,3.5vw,1.9rem)}
+header p{color:var(--muted);max-width:40rem;margin:0}
 main{max-width:860px;margin:0 auto;padding:24px 20px 80px}
-.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
-.card{background:#fff;border:1px solid #d9d1c3;border-radius:16px;padding:16px}
-.tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mint);font-weight:700}
-a.btn{display:inline-block;margin:8px 8px 0 0;padding:10px 14px;border-radius:12px;background:var(--mint);color:#fff;text-decoration:none;font-weight:700}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin:12px 0 28px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.card h3{margin:6px 0 8px}
+.card p{color:var(--muted);font-size:14px;margin:0 0 12px}
+a.btn{
+  display:inline-block;margin:4px 8px 0 0;padding:10px 14px;border-radius:12px;
+  background:var(--mint);color:var(--mint-ink);text-decoration:none;font-weight:700;font-size:14px
+}
 a.ghost{background:transparent;color:var(--mint);border:1px solid var(--mint)}
-ol{padding-left:20px}
-.muted{color:#5c564e}
+.step{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.note{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;margin-top:8px}
 </style>
 </head>
 <body>
 <header>
-  <div class="tag">Preview tour</div>
-  <h1>How the whole set works</h1>
-  <p>Walk the free apps, then the paid desks, then Jories pay. Nothing here charges a real card.</p>
+  <div class="tag">AEGIS Floodwatch only</div>
+  <h1>Free map → Science Desk</h1>
+  <p>One product line: global hazard watch and flood risk screening. No other apps in this pack.</p>
 </header>
 <main>
-  <h2>1. Customer arrives</h2>
+  <div class="step">Step 1 — free</div>
   <div class="grid">
     <div class="card">
-      <div class="tag">Free map</div>
+      <div class="tag">Live map</div>
       <h3>AEGIS Floodwatch</h3>
-      <p class="muted">World disaster map. Public watch is free.</p>
+      <p>World OSM map with NASA EONET, USGS M4.5+ quakes, optional GDACS. Get me to safety and SAWS stay free. Official warnings beat AEGIS.</p>
       <a class="btn ghost" href="./index.html">Open free map</a>
     </div>
-    <div class="card">
-      <div class="tag">Free board</div>
-      <h3>Judgment OS</h3>
-      <p class="muted">Public household brief.</p>
-      <a class="btn ghost" href="https://esteprinsloo101-web.github.io/judgment-os/">Open free brief</a>
-    </div>
-    <div class="card">
-      <div class="tag">Free board</div>
-      <h3>RandRadar</h3>
-      <p class="muted">Grocery and flight specials.</p>
-      <a class="btn ghost" href="https://esteprinsloo101-web.github.io/randradar/">Open free board</a>
-    </div>
   </div>
 
-  <h2>2. They tap paid</h2>
-  <p class="muted">This is the product they get after Paystack. Preview first, checkout second.</p>
+  <div class="step">Step 2 — paid</div>
   <div class="grid">
     <div class="card">
-      <div class="tag">Paid R89</div>
-      <h3>AEGIS Science Desk</h3>
-      <p class="muted">Today’s household actions from the map.</p>
-      <a class="btn" href="./desk.html">Preview paid page</a>
-      <a class="btn ghost" href="https://paystack.com/pay/aegis-science-desk">Test checkout</a>
-    </div>
-    <div class="card">
-      <div class="tag">Paid R89</div>
-      <h3>Judgment OS desk</h3>
-      <p class="muted">Fill / wait / sign / hold list.</p>
-      <a class="btn" href="./judgment-desk.html">Preview paid page</a>
-      <a class="btn ghost" href="https://paystack.com/pay/judgment-os-desk">Test checkout</a>
-    </div>
-    <div class="card">
-      <div class="tag">Paid R49</div>
-      <h3>RandRadar Radar+</h3>
-      <p class="muted">WhatsApp draft after work.</p>
-      <a class="btn" href="./radar-plus.html">Preview paid page</a>
-      <a class="btn ghost" href="https://paystack.com/pay/randradar-plus">Test checkout</a>
+      <div class="tag">Science Desk · R89</div>
+      <h3>Methods &amp; decision limits</h3>
+      <p>Manning / WSE / wet cell, GLOF volume–time, Omori–Utsu, tsunami √(gH), FWI screening, lead-time table, and a planner workflow. Preview the page anytime.</p>
+      <a class="btn ghost" href="./desk.html">Preview Science Desk</a>
+      <a class="btn" href="https://paystack.com/pay/aegis-science-desk" target="_blank" rel="noopener">Paystack R89</a>
     </div>
   </div>
 
-  <h2>3. Jories job (Retief Jordaan)</h2>
-  <div class="card">
-    <p>Quote on WhatsApp 083 408 6529 or retief012@gmail.com. Then customer pays the deposit in Retief Jordaan’s name.</p>
-    <a class="btn" href="./jories-pay.html">Preview Jories pay flow</a>
-    <a class="btn ghost" href="https://paystack.com/pay/jories">Test checkout</a>
-  </div>
-
-  <h2>4. What happens after Pay now</h2>
-  <ol>
-    <li>Paystack test page (yellow banner). Use card 4084 0840 8408 4081 / 08/27 / 408.</li>
-    <li>Success screen from Paystack.</li>
-    <li>When live mode is on, they get the paid page / WhatsApp / brief. Tonight that hand-off is still a preview.</li>
-  </ol>
+  <p class="note">
+    Paystack test / live checkout: <a href="https://paystack.com/pay/aegis-science-desk" style="color:var(--mint)">paystack.com/pay/aegis-science-desk</a>.
+    This preview does not charge a card by itself — use Paystack to complete payment.
+    Screening product only; not an official warning service.
+  </p>
 </main>
 </body>
 </html>
