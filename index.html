@@ -1,8 +1,90 @@
+
 <!DOCTYPE html>
-<html lang="en">
-<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Offline</title></head>
-<body style="font-family:system-ui;padding:48px;background:#111;color:#eee">
-<h1>Offline</h1>
-<p>AEGIS Floodwatch is offline while the product is rebuilt.</p>
+<html lang="en-ZA">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AEGIS Floodwatch — live world disaster map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#070b12;color:#e7eef6;font-family:system-ui,sans-serif}
+header{padding:14px 16px}
+.brand span{color:#3ee0c6}
+.hero{font-size:26px;margin:8px 0}
+.lead{color:#8b9bb0;max-width:740px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+button,.btn{border-radius:12px;padding:10px 14px;font-weight:700;border:0;cursor:pointer;text-decoration:none;display:inline-block}
+.solid{background:#3ee0c6;color:#06221e}.ghost{background:transparent;border:1px solid #243648;color:#e7eef6}
+.banner{background:#3a2410;color:#ffe7bf;padding:10px 16px}
+#map{height:62dvh;min-height:360px;width:100%}
+.legend,.wrap{padding:10px 16px;color:#8b9bb0;font-size:13px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 6px 0 10px}
+.card{background:#101820;border:1px solid #243648;border-radius:16px;padding:14px;margin:12px 0;color:#e7eef6}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">AEGIS <span>FLOODWATCH</span></div>
+  <h1 class="hero">Live world map. Every open storm, fire, quake and flood we can plot.</h1>
+  <p class="lead">The map starts on the whole Earth. Texas, the Pacific and South Africa are pins, not only a Cape zoom.</p>
+  <div class="row">
+    <button class="solid" id="world">World</button>
+    <button class="ghost" id="texas">Texas / Edouard</button>
+    <button class="ghost" id="sa">South Africa</button>
+    <button class="ghost" id="go">Place me</button>
+    <a class="btn ghost" href="desk.html">Preview paid Science Desk</a>
+  </div>
+</header>
+<div class="banner" id="banner">Loading live layers…</div>
+<div id="map"></div>
+<div class="legend">
+  <span class="dot" style="background:#ff4d6a"></span>storm / flood
+  <span class="dot" style="background:#ffb020"></span>wildfire
+  <span class="dot" style="background:#c084fc"></span>volcano
+  <span class="dot" style="background:#60a5fa"></span>earthquake
+</div>
+<div class="wrap">
+  <div class="card" id="free-safety" style="border-color:#3ee0c6">
+    <h3>Free — Get me to safety</h3>
+    <p><b>Official warnings beat AEGIS.</b> If water is rising or roads flood: move to higher ground, never drive through flood water, follow SAWS / local disaster management.</p>
+    <p class="row">
+      <button class="solid" id="go2">Place me on the map</button>
+      <a class="btn ghost" href="https://www.weathersa.co.za/" target="_blank" rel="noopener">SAWS official</a>
+    </p>
+  </div>
+  <div class="card" id="paid">
+    <h3>Paid product — AEGIS Science Desk R89</h3>
+    <p>After pay you get the household brief, not a second map. Preview: <a class="btn solid" href="desk.html">Open paid page preview</a></p>
+    <p><a class="btn solid" href="https://paystack.com/pay/aegis-science-desk">Paystack Science Desk R89</a></p>
+  </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map=L.map("map").setView([15,0],2);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OSM"}).addTo(map);
+function col(c){c=(c||"").toLowerCase();if(c.includes("fire"))return"#ffb020";if(c.includes("volcano"))return"#c084fc";if(c.includes("quake"))return"#60a5fa";return"#ff4d6a"}
+function pin(lat,lon,t,c){return L.circleMarker([lat,lon],{radius:8,color:col(c),fillColor:col(c),fillOpacity:.9,weight:2}).addTo(map).bindPopup("<b>"+t+"</b><br>"+c);}
+const edouard=pin(29.4,-93.3,"Tropical Storm Edouard — Texas / Louisiana landfall","storms");
+pin(15,-120,"Hurricane Karina — East Pacific","storms");
+pin(12,-155,"Hurricane Lowell — Central Pacific","storms");
+pin(16,-110,"Tropical Storm Marie — East Pacific","storms");
+L.circle([-34.1,20.5],{radius:90000,color:"#ff4d6a",fillOpacity:.15}).addTo(map).bindPopup("SAWS Yellow 4 rain — Overberg / Garden Route");
+L.circle([-32.2,20.2],{radius:120000,color:"#ffb020",fillOpacity:.12}).addTo(map).bindPopup("SAWS Yellow 4 wind — Namakwa / Karoo");
+let n=4;
+fetch("https://eonet.gsfc.nasa.gov/api/v3/events?status=open&limit=50").then(r=>r.json()).then(d=>{(d.events||[]).forEach(ev=>{const g=(ev.geometry||[]).slice(-1)[0];if(!g||!g.coordinates)return;const lon=g.coordinates[0],lat=g.coordinates[1];if(!isFinite(lat)||!isFinite(lon))return;n++;pin(lat,lon,ev.title,(ev.categories[0]&&ev.categories[0].title)||"event");});document.getElementById("banner").textContent=n+" live points on the world map.";}).catch(()=>{document.getElementById("banner").textContent="Live feed limited. Edouard / Pacific / SAWS pins are on the map — tap Texas / Edouard.";});
+fetch("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson").then(r=>r.json()).then(d=>{(d.features||[]).slice(0,30).forEach(f=>{const c=f.geometry.coordinates;pin(c[1],c[0],f.properties.place,"earthquakes");n++;});document.getElementById("banner").textContent=n+" live points on the world map.";}).catch(()=>{});
+document.getElementById("world").onclick=()=>map.setView([15,0],2);
+document.getElementById("texas").onclick=()=>{map.setView([29.4,-93.3],6);edouard.openPopup();};
+document.getElementById("sa").onclick=()=>map.setView([-30,24],5);
+function placeMe(){
+  if(!navigator.geolocation)return alert("Turn location on.");
+  navigator.geolocation.getCurrentPosition(p=>{
+    L.circleMarker([p.coords.latitude,p.coords.longitude],{radius:8,color:"#4ade80",fillColor:"#4ade80",fillOpacity:1}).addTo(map).bindPopup("You are here").openPopup();
+    map.setView([p.coords.latitude,p.coords.longitude],7);
+  });
+}
+document.getElementById("go").onclick=placeMe;
+document.getElementById("go2").onclick=placeMe;
+</script>
 </body>
 </html>
