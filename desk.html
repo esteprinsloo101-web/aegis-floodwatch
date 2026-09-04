@@ -1,36 +1,61 @@
 <!DOCTYPE html>
-<html lang="en-ZA">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AEGIS Science Desk — paid product</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AEGIS Science Desk</title>
 <style>
-body{margin:0;background:#070b12;color:#e7eef6;font-family:system-ui,sans-serif;line-height:1.5}
-main{max-width:720px;margin:0 auto;padding:24px 16px 80px}
-.card{background:#101820;border:1px solid #243648;border-radius:16px;padding:16px;margin:12px 0}
-.tag{color:#3ee0c6;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
-a{color:#3ee0c6}
+body{margin:0;background:#071018;color:#e8f0f6;font-family:system-ui,sans-serif;line-height:1.5}
+main{max-width:760px;margin:0 auto;padding:24px 16px 80px}
+.card{background:#0e1822;border:1px solid #1e2e3c;border-radius:14px;padding:16px;margin:12px 0}
+.tag{color:#2ee6c5;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+a.btn{display:inline-block;background:#2ee6c5;color:#04221c;text-decoration:none;font-weight:700;padding:10px 14px;border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{border-bottom:1px solid #1e2e3c;padding:6px 4px;text-align:left}
 </style>
 </head>
 <body>
 <main>
-<p class="tag">AEGIS Floodwatch · paid area · R89</p>
+<p class="tag">AEGIS · paid Science Desk · R89</p>
 <h1>Science Desk</h1>
-<p>This is the product after payment. You do not need to pay to review it.</p>
+<p>Public alerts and Get-me-to-safety stay free. This page is the paid product: methods, numbers, and the limits of prediction.</p>
+<p><a class="btn" href="https://link.payoneer.com/Token?t=A938DA53D50E464FB7E8C35081F7344F&src=pl" target="_blank" rel="noopener">Pay with Payoneer</a>
+<a class="btn" href="./index.html" style="background:#13202b;color:#e8f0f6;margin-left:8px">Back to live map</a></p>
 <div class="card">
-<h2>Today — 1 Sep 2026</h2>
-<ol>
-<li>No hurricane is coming to South Africa.</li>
-<li>SAWS Yellow 4 cut-off low Thu–Fri: rain Overberg / Garden Route, wind Namakwa / Karoo / Winelands.</li>
-<li>Cape: lift paint, cement and tools off the floor before Thursday night.</li>
-<li>Karoo: tie loose roof sheets before Friday wind.</li>
-<li>Edouard (Texas) stays on the public map as watch-only.</li>
-</ol>
+<h2>HEC-RAS principle used here</h2>
+<p>We do not run the USACE HEC-RAS binary. We run the first equations it uses.</p>
+<p><b>Q = (1/n) A R<sup>2/3</sup> S<sup>1/2</sup></b> (Manning). Normal depth y is solved so computed Q matches GloFAS discharge. Water-surface elevation WSE = zmin + y. A cell is wet if terrain z < WSE.</p>
+<p>GLOF peak screen: Qpeak ≈ released volume / breach duration. That is a volume-time weir screen, not a 15-day monsoon hydrograph.</p>
 </div>
-<div class="card"><h3>House</h3><p>Photo the roof tonight. Clear gutters.</p></div>
-<div class="card"><h3>Road</h3><p>Skip Garden Route Thursday if you can. No low crossings after dark Friday.</p></div>
-<div class="card"><h3>Cash</h3><p>No panic shopping. Sandbags only if your door already floods.</p></div>
-<p><a href="./index.html">Back to AEGIS map</a> · <a href="https://paystack.com/pay/aegis-science-desk">Paystack (only if testing pay)</a></p>
+<div class="card">
+<h2>What can be timed</h2>
+<table>
+<tr><th>Event</th><th>Method</th><th>Lead</th></tr>
+<tr><td>River flood</td><td>GloFAS / LISFLOOD ensemble</td><td>1–15 days to peak</td></tr>
+<tr><td>Flash / GLOF</td><td>Trigger + valley routing</td><td>minutes–hours</td></tr>
+<tr><td>Cyclone</td><td>NWP tracks + GDACS radii</td><td>12 h–7 days</td></tr>
+<tr><td>Tornado</td><td>CAPE/shear then radar warning</td><td>days → minutes</td></tr>
+<tr><td>Earthquake origin</td><td>None</td><td>not predictable</td></tr>
+<tr><td>Aftershocks</td><td>Omori–Utsu n(t)=K/(c+t)^p</td><td>hours–weeks</td></tr>
+<tr><td>Tsunami</td><td>√(gH) deep-ocean speed</td><td>minutes–30 h</td></tr>
+<tr><td>Wildfire ignition</td><td>FWI / Fosberg alignment only</td><td>no spark time</td></tr>
+</table>
+</div>
+<div class="card">
+<h2>Nepal–Tibet 26 August 2026</h2>
+<p>Ice-rock avalanche into the Lhende River, short-lived debris dam, dam-break surge into the Bhotekoshi–Trishuli system. GDACS carried a Red flood for Nepal. Secondary barrier-lake watch followed. Climb off the valley floor; do not wait for a 10-day discharge peak.</p>
+</div>
+<div class="card">
+<h2>Sources</h2>
+<ul>
+<li>Copernicus GloFAS via Open-Meteo Flood API</li>
+<li>USGS earthquake GeoJSON</li>
+<li>GDACS RSS</li>
+<li>Open-Meteo weather (ICON / GFS / ECMWF — Ventusky model family)</li>
+<li>OSRM public routing</li>
+</ul>
+<p>Screening product. Not SAWS, USGS, PTWC, or a licensed hydraulic study.</p>
+</div>
 </main>
 </body>
 </html>
