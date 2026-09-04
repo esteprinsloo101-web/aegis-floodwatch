@@ -1,60 +1,149 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-ZA">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>AEGIS Science Desk</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AEGIS Science Desk — methods &amp; limits</title>
 <style>
-body{margin:0;background:#071018;color:#e8f0f6;font-family:system-ui,sans-serif;line-height:1.5}
+:root{
+  --bg:#071018; --card:#0e1822; --line:#1e2e3c; --text:#e8f0f6; --muted:#8b9bb0;
+  --mint:#2ee6c5; --mint-ink:#04221c;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.55}
 main{max-width:760px;margin:0 auto;padding:24px 16px 80px}
-.card{background:#0e1822;border:1px solid #1e2e3c;border-radius:14px;padding:16px;margin:12px 0}
-.tag{color:#2ee6c5;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
-a.btn{display:inline-block;background:#2ee6c5;color:#04221c;text-decoration:none;font-weight:700;padding:10px 14px;border-radius:10px}
+.tag{color:var(--mint);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 8px}
+h1{font-size:clamp(1.4rem,3vw,1.85rem);margin:0 0 10px}
+h2{font-size:1.1rem;margin:0 0 10px}
+p,li{color:var(--muted);font-size:15px}
+p strong,li strong,td strong{color:var(--text)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0}
+a.btn{
+  display:inline-block;background:var(--mint);color:var(--mint-ink);text-decoration:none;
+  font-weight:700;padding:11px 16px;border-radius:10px;margin:4px 8px 4px 0;font-size:14px
+}
+a.btn.ghost{background:#13202b;color:var(--text);border:1px solid var(--line)}
 table{width:100%;border-collapse:collapse;font-size:13px}
-td,th{border-bottom:1px solid #1e2e3c;padding:6px 4px;text-align:left}
+th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top;color:var(--muted)}
+th{color:var(--text);font-weight:650}
+code,pre{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:13px;background:#0a121a;border:1px solid var(--line);border-radius:8px
+}
+code{padding:1px 6px}
+pre{padding:12px;overflow:auto;color:#c8e6dc;line-height:1.4}
+ol.steps{padding-left:22px;margin:8px 0}
+ol.steps li{margin:8px 0}
+ul.sources{padding-left:20px}
+ul.sources a{color:var(--mint)}
+.pay-row{margin:16px 0 8px}
+.note{font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
 <main>
-<p class="tag">AEGIS · paid Science Desk · R89</p>
+<p class="tag">AEGIS Floodwatch · Science Desk · R89</p>
 <h1>Science Desk</h1>
-<p>Public alerts and Get-me-to-safety stay free. This page is the paid product: methods, numbers, and the limits of prediction.</p>
-<p><a class="btn" href="https://link.payoneer.com/Token?t=A938DA53D50E464FB7E8C35081F7344F&src=pl" target="_blank" rel="noopener">Pay with Payoneer</a>
-<a class="btn" href="./index.html" style="background:#13202b;color:#e8f0f6;margin-left:8px">Back to live map</a></p>
-<div class="card">
-<h2>HEC-RAS principle used here</h2>
-<p>We do not run the USACE HEC-RAS binary. We run the first equations it uses.</p>
-<p><b>Q = (1/n) A R<sup>2/3</sup> S<sup>1/2</sup></b> (Manning). Normal depth y is solved so computed Q matches GloFAS discharge. Water-surface elevation WSE = zmin + y. A cell is wet if terrain z < WSE.</p>
-<p>GLOF peak screen: Qpeak ≈ released volume / breach duration. That is a volume-time weir screen, not a 15-day monsoon hydrograph.</p>
+<p>
+  Public map layers and <strong>Get me to safety</strong> stay free.
+  This desk is the paid product: screening methods, hydro limits, lead times, and decision boundaries for scientists, emergency planners, and serious public users.
+</p>
+
+<div class="pay-row">
+  <a class="btn" href="https://paystack.com/pay/aegis-science-desk" target="_blank" rel="noopener">Pay with Paystack — R89</a>
+  <a class="btn ghost" href="./index.html">Back to live map</a>
 </div>
+<p class="note">Payment via Paystack only for this desk. Preview this page freely; unlock is for the methods pack usage you intend to rely on in planning.</p>
+
 <div class="card">
-<h2>What can be timed</h2>
-<table>
-<tr><th>Event</th><th>Method</th><th>Lead</th></tr>
-<tr><td>River flood</td><td>GloFAS / LISFLOOD ensemble</td><td>1–15 days to peak</td></tr>
-<tr><td>Flash / GLOF</td><td>Trigger + valley routing</td><td>minutes–hours</td></tr>
-<tr><td>Cyclone</td><td>NWP tracks + GDACS radii</td><td>12 h–7 days</td></tr>
-<tr><td>Tornado</td><td>CAPE/shear then radar warning</td><td>days → minutes</td></tr>
-<tr><td>Earthquake origin</td><td>None</td><td>not predictable</td></tr>
-<tr><td>Aftershocks</td><td>Omori–Utsu n(t)=K/(c+t)^p</td><td>hours–weeks</td></tr>
-<tr><td>Tsunami</td><td>√(gH) deep-ocean speed</td><td>minutes–30 h</td></tr>
-<tr><td>Wildfire ignition</td><td>FWI / Fosberg alignment only</td><td>no spark time</td></tr>
-</table>
+  <h2>Methods (screening equations)</h2>
+  <p><strong>River conveyance (Manning)</strong></p>
+  <pre>Q = (1/n) · A · R^(2/3) · S^(1/2)</pre>
+  <p>
+    <code>Q</code> discharge, <code>n</code> Manning roughness, <code>A</code> cross-section area,
+    <code>R</code> hydraulic radius, <code>S</code> friction slope.
+    Normal depth <code>y</code> is solved so computed <code>Q</code> matches a discharge estimate (e.g. GloFAS / Open-Meteo flood).
+    Water-surface elevation: <strong>WSE = z<sub>min</sub> + y</strong>.
+    A DEM cell is treated as <strong>wet</strong> if terrain <code>z &lt; WSE</code>.
+  </p>
+  <p><strong>GLOF / dam-break volume–time screen</strong></p>
+  <pre>Q_peak ≈ V_released / t_breach</pre>
+  <p>Volume over breach duration — a weir-style screen, not a multi-day monsoon hydrograph.</p>
+  <p><strong>Aftershocks (Omori–Utsu)</strong></p>
+  <pre>n(t) = K / (c + t)^p</pre>
+  <p>Rate decay after a mainshock. Useful for planning windows; does not predict the next large event.</p>
+  <p><strong>Tsunami deep-ocean speed</strong></p>
+  <pre>c ≈ √(g · H)</pre>
+  <p>Long-wave speed in depth <code>H</code>. Travel-time screening only — coastal run-up needs dedicated models and official PTWC/NTWC products.</p>
+  <p><strong>Wildfire screening (FWI family)</strong></p>
+  <p>
+    Fire Weather Index / Fosberg-style alignment of wind, temperature, humidity, and fuel dryness.
+    Screens ignition / spread <em>conditions</em> — it does not timestamp a spark.
+  </p>
 </div>
+
 <div class="card">
-<h2>Nepal–Tibet 26 August 2026</h2>
-<p>Ice-rock avalanche into the Lhende River, short-lived debris dam, dam-break surge into the Bhotekoshi–Trishuli system. GDACS carried a Red flood for Nepal. Secondary barrier-lake watch followed. Climb off the valley floor; do not wait for a 10-day discharge peak.</p>
+  <h2>Lead-time table — what can / cannot be timed</h2>
+  <table>
+    <thead>
+      <tr><th>Event</th><th>Method</th><th>Lead / limit</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>River flood</td><td>GloFAS / LISFLOOD-style ensemble discharge</td><td>roughly 1–15 days to peak (model-dependent)</td></tr>
+      <tr><td>Flash flood / GLOF</td><td>Trigger + valley routing / volume–time</td><td>minutes to hours once triggered</td></tr>
+      <tr><td>Tropical cyclone</td><td>NWP tracks + advisory radii (e.g. GDACS)</td><td>~12 h to ~7 days</td></tr>
+      <tr><td>Tornado / severe convective</td><td>CAPE/shear then radar warning</td><td>days (env) → minutes (warn)</td></tr>
+      <tr><td><strong>Earthquake origin</strong></td><td><strong>None</strong></td><td><strong>not predictable</strong></td></tr>
+      <tr><td>Aftershocks</td><td>Omori–Utsu rate</td><td>hours to weeks (statistical)</td></tr>
+      <tr><td>Tsunami</td><td>√(gH) + official bulletins</td><td>minutes to ~30 h travel screen</td></tr>
+      <tr><td>Wildfire ignition</td><td>FWI / weather alignment</td><td>no ignition clock</td></tr>
+    </tbody>
+  </table>
+  <p class="note" style="margin-top:12px">Never invent disaster start times. Earthquake origin time is not a forecast product.</p>
 </div>
+
 <div class="card">
-<h2>Sources</h2>
-<ul>
-<li>Copernicus GloFAS via Open-Meteo Flood API</li>
-<li>USGS earthquake GeoJSON</li>
-<li>GDACS RSS</li>
-<li>Open-Meteo weather (ICON / GFS / ECMWF — Ventusky model family)</li>
-<li>OSRM public routing</li>
-</ul>
-<p>Screening product. Not SAWS, USGS, PTWC, or a licensed hydraulic study.</p>
+  <h2>How to use with the free map</h2>
+  <ol class="steps">
+    <li><strong>Pin</strong> — on the free map, click an event and fly to its lat/lon.</li>
+    <li><strong>Source</strong> — read the popup source (EONET, USGS, GDACS if available). Prefer the named agency feed.</li>
+    <li><strong>Method</strong> — pick the matching equation above (Manning/WSE for river flood, √(gH) for tsunami travel screen, Omori–Utsu for aftershock windows, FWI for fire weather).</li>
+    <li><strong>Decision limits</strong> — treat AEGIS as screening. If SAWS or another official body issues a warning, that overrides this desk. Do not paywall escape guidance — Get me to safety stays free on the map.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h2>Practical workflow (scientist / planner)</h2>
+  <ol class="steps">
+    <li>Open the free live map; confirm layers (EONET, USGS, GDACS) and your region of interest (World / SA focus / GPS).</li>
+    <li>List open hazards that intersect your basin, coast, or municipality.</li>
+    <li>For floods: pull discharge or advisory context from GloFAS / Open-Meteo Flood or national hydro; apply Manning → WSE → wet-cell screen on a DEM you control.</li>
+    <li>For GLOF / breach: estimate released volume and breach duration; compare Q_peak to channel capacity — escalate if valley floor is occupied.</li>
+    <li>For seismicity: use USGS for what already happened; plan aftershock logistics with Omori–Utsu; never claim origin prediction.</li>
+    <li>For tsunami watch: use √(gH) only for rough travel; defer to PTWC/NTWC and coastal authorities for evacuation.</li>
+    <li>For fire weather: compute/consult FWI-class indices; stage resources on high-FWI days without inventing ignition times.</li>
+    <li>Document assumptions (n, DEM date, ensemble member). Hand official warning channels to the public first.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h2>Sources</h2>
+  <ul class="sources">
+    <li><a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener">USGS</a> — earthquake GeoJSON feeds</li>
+    <li><a href="https://eonet.gsfc.nasa.gov/" target="_blank" rel="noopener">NASA EONET</a> — open natural events</li>
+    <li><a href="https://www.globalfloods.eu/" target="_blank" rel="noopener">GloFAS</a> / <a href="https://open-meteo.com/en/docs/flood-api" target="_blank" rel="noopener">Open-Meteo Flood API</a> — flood discharge ensembles</li>
+    <li><a href="https://www.gdacs.org/" target="_blank" rel="noopener">GDACS</a> — multi-hazard alerts (CORS may block browser fetch)</li>
+    <li><a href="https://www.weathersa.co.za/" target="_blank" rel="noopener">SAWS</a> — South African Weather Service official warnings</li>
+  </ul>
+  <p class="note">
+    Screening product. Not SAWS, USGS, PTWC, GDACS, or a licensed hydraulic study.
+    Official warnings beat AEGIS.
+  </p>
+</div>
+
+<div class="pay-row">
+  <a class="btn" href="https://paystack.com/pay/aegis-science-desk" target="_blank" rel="noopener">Pay with Paystack — R89</a>
+  <a class="btn ghost" href="./index.html">Back to live map</a>
 </div>
 </main>
 </body>
