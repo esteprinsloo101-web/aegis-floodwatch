@@ -2,7 +2,7 @@ window.AEGIS_DATA = {
   pricing: {
     rule: "Public map and Get me to safety are free. You only pay for the Science Desk.",
     rails: {
-      paystack: "https://paystack.com/pay/aegis-science-desk"
+      paystack: "https://paystack.shop/pay/mf-aegis-desk"
     },
     tiers: [
       {

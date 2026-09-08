@@ -9,7 +9,7 @@ Standalone **flood / disaster science** product: global hazard watch and flood r
 | **Free live map** (`index.html`) | Leaflet OSM world map, NASA EONET open events, USGS M4.5+ week, optional GDACS, event list, Get me to safety (SAWS + higher ground). |
 | **Science Desk R89** (`desk.html`) | Screening methods (Manning, WSE, wet cell, GLOF volume/time, Omori–Utsu, √(gH), FWI), lead-time table, planner workflow, sources. |
 
-Payment: **Paystack only** — https://paystack.com/pay/aegis-science-desk
+Payment: **Paystack only** — https://paystack.shop/pay/mf-aegis-desk
 
 Product explainer: `preview.html`
 
